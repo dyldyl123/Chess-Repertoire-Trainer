@@ -1,9 +1,9 @@
 import { useState, useContext } from "react"
-import fetchLogin from "../utils/Login"
+import register from "../utils/register"
 import { useNavigate } from "react-router-dom"
 import { UserContext } from "../App"
-import { LoggedInContext } from "../App"
-export default function Login({ setIsLoggedIn }) {
+
+export default function Register({ setIsLoggedIn }) {
 	const navigate = useNavigate()
 	const [formValue, setFormValue] = useState({})
 	const { user, setUser } = useContext(UserContext)
@@ -15,10 +15,13 @@ export default function Login({ setIsLoggedIn }) {
 		const { name, value } = event.target
 		setFields({ ...fields, [name]: value })
 	}
-	const onSignIn = async (event) => {
+	const onRegister = async (event) => {
 		event.preventDefault()
 		setFormValue(fields)
-		const loggedInReponse = await fetchLogin(fields)
+		const loggedInReponse = await register(fields)
+
+		console.log("hi")
+		console.log(loggedInReponse)
 		if (loggedInReponse.user) {
 			setIsLoggedIn(true)
 			setUser(loggedInReponse.user)
@@ -26,22 +29,14 @@ export default function Login({ setIsLoggedIn }) {
 		}
 	}
 
-	const onNavigate = (event) => {
-		event.preventDefault()
-		navigate("/register")
-	}
 	return (
 		<div className="login-form">
-			<form onSubmit={onSignIn}>
+			<form onSubmit={onRegister}>
 				<label htmlFor="username">Username</label>
 				<input type="text" name="username" onChange={onType} value={fields.username}></input>
 				<input type="password" name="password" onChange={onType} value={fields.password}></input>
 				<button type="submit">SUBMIT</button>
 			</form>
-
-			<div>
-				Don't have an account? Click <p onClick={onNavigate}>Here </p> to Signup
-			</div>
 		</div>
 	)
 }

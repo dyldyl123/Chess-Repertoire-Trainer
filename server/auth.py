@@ -106,3 +106,12 @@ def create_position():
     db.session.add(position)
     db.session.commit()
     return jsonify(position.to_dict())
+
+
+@auth_router.route('/api/positions/<user_id>', methods=['GET'])
+@login_required
+def get_positions(user_id):
+    positions = Position.query.filter(Position.user_id == user_id).all()
+    position_dicts = [position.to_dict() for position in positions]
+    return jsonify(position_dicts)
+

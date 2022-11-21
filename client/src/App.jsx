@@ -4,6 +4,8 @@ import "./App.css"
 import verifyLogin from "./utils/verifyLogin"
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom"
 import Login from "./components/Login"
+import Register from "./components/Register"
+import PositionTree from "./components/PositionTree"
 export const LoggedInContext = createContext(false)
 export const UserContext = createContext({})
 function App() {
@@ -43,7 +45,16 @@ function App() {
 								<UserContext.Provider value={{ user, setUser }}>
 									<RequireLoggedIn>
 										<ChessBoardWidget></ChessBoardWidget>
+										<PositionTree></PositionTree>
 									</RequireLoggedIn>
+								</UserContext.Provider>
+							}
+						></Route>
+						<Route
+							path="/register"
+							element={
+								<UserContext.Provider value={{ user, setUser }}>
+									<Register setIsLoggedIn={setIsLoggedIn} />
 								</UserContext.Provider>
 							}
 						></Route>
