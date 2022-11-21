@@ -6,6 +6,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom"
 import Login from "./components/Login"
 import Register from "./components/Register"
 import PositionTree from "./components/PositionTree"
+import PositionBuilder from "./components/PositionBuilder"
 export const LoggedInContext = createContext(false)
 export const UserContext = createContext({})
 function App() {
@@ -44,8 +45,7 @@ function App() {
 							element={
 								<UserContext.Provider value={{ user, setUser }}>
 									<RequireLoggedIn>
-										<ChessBoardWidget></ChessBoardWidget>
-										<PositionTree></PositionTree>
+										<PositionBuilder></PositionBuilder>
 									</RequireLoggedIn>
 								</UserContext.Provider>
 							}

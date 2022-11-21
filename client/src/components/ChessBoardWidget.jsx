@@ -5,8 +5,7 @@ import cloneDeep from "lodash/cloneDeep"
 import SaveEditMode from "./SaveEditMode"
 import { useContext } from "react"
 import { UserContext } from "../App"
-export default function ChessBoardWidget() {
-	const [game, setGame] = useState(new Chess())
+export default function ChessBoardWidget({ game, setGame }) {
 	const { user, setuser } = useContext(UserContext)
 	function makeAMove(move) {
 		// const gameCopy = structuredClone(game)

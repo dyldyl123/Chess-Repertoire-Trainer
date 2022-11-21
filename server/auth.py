@@ -3,6 +3,8 @@ from models import User, Position
 from app import db
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from merge import combinePGN
+
 auth_router = Blueprint(__name__,'auth')
 
 def login_required(fn):
@@ -113,5 +115,24 @@ def create_position():
 def get_positions(user_id):
     positions = Position.query.filter(Position.user_id == user_id).all()
     position_dicts = [position.to_dict() for position in positions]
+    pgns = [position.pgn for position in positions]
+    output = combinePGN(pgns)
+    
     return jsonify(position_dicts)
+
+
+
+@auth_router.route('/api/mergepositions/<user_id>', methods=['GET'])
+@login_required
+def merge_positions(user_id):
+    positions = Position.query.filter(Position.user_id == user_id).all()
+    # position_dicts = [position.to_dict() for position in positions]
+    pgns = [position.pgn for position in positions]
+    print("pgn")
+    print(pgns)
+    output = combinePGN(pgns)
+    output2 = str(output)
+    print(output2)
+    return jsonify(output2)
+
 
