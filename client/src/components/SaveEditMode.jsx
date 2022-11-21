@@ -1,5 +1,9 @@
 import savePosition from "../utils/savePosition"
-
-export default function SaveEditMode({ pgn }) {
-	return <button onClick={() => savePosition(1, pgn)}> Save</button>
+import createPosition from "../utils/createPosition"
+export default function SaveEditMode({ pgn, colour }) {
+	const formattedData = {
+		pgn: pgn,
+		colour: colour,
+	}
+	return <button onClick={() => createPosition(formattedData)}> Save</button>
 }

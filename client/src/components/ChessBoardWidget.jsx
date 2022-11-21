@@ -3,9 +3,11 @@ import { Chess } from "chess.js"
 import { Chessboard } from "react-chessboard"
 import cloneDeep from "lodash/cloneDeep"
 import SaveEditMode from "./SaveEditMode"
+import { useContext } from "react"
+import { UserContext } from "../App"
 export default function ChessBoardWidget() {
 	const [game, setGame] = useState(new Chess())
-
+	const { user, setuser } = useContext(UserContext)
 	function makeAMove(move) {
 		// const gameCopy = structuredClone(game)
 		console.log(move)
@@ -43,8 +45,9 @@ export default function ChessBoardWidget() {
 
 	return (
 		<div className="edit-mode">
+			<p>{JSON.stringify(user)}</p>
 			<Chessboard position={game.fen()} onPieceDrop={onDrop} />
-			<SaveEditMode pgn={game.pgn()}></SaveEditMode>
+			<SaveEditMode pgn={game.pgn()} colour={game.turn()}></SaveEditMode>
 		</div>
 	)
 }

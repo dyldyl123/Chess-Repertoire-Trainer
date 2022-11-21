@@ -54,7 +54,7 @@ class Position(db.Model):
     fen = db.Column(db.Text)
     pgn = db.Column(db.Text)
     comment = db.Column(db.Text)
-    colour = db.Column(db.Boolean)
+    colour = db.Column(db.String(1))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def to_dict(self):

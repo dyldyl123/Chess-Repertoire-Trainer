@@ -1,7 +1,7 @@
-export default async function savePosition(id, positionData) {
+export default async function createPosition(positionData) {
 	// fen, folder_id, colour, user_id
-	let data = await fetch(`/api/position/${id}`, {
-		method: "PUT",
+	let data = await fetch(`/api/position/`, {
+		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},

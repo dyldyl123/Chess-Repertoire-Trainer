@@ -5,7 +5,7 @@ import verifyLogin from "./utils/verifyLogin"
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom"
 import Login from "./components/Login"
 export const LoggedInContext = createContext(false)
-export const UserContext = createContext(false)
+export const UserContext = createContext({})
 function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(() => {
 		return //
@@ -20,35 +20,36 @@ function App() {
 		}
 		return <Navigate to="/login" />
 	}
-
 	useEffect(() => {
 		verifyLogin()
 	}, [])
 
-	const LoggedInUser = useContext(UserContext)
-	console.log("wot")
-	console.log(user)
-	console.log(LoggedInUser)
 	return (
 		<LoggedInContext.Provider value={isLoggedIn}>
-			<UserContext.Provider value={user}>
-				<BrowserRouter>
-					<div className="App">
-						<Routes>
-							<Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUser={setUser} />}></Route>
-							<Route
-								path="/"
-								element={
+			<BrowserRouter>
+				<div className="App">
+					<Routes>
+						<Route
+							path="/login"
+							element={
+								<UserContext.Provider value={{ user, setUser }}>
+									<Login setIsLoggedIn={setIsLoggedIn} />
+								</UserContext.Provider>
+							}
+						></Route>
+						<Route
+							path="/"
+							element={
+								<UserContext.Provider value={{ user, setUser }}>
 									<RequireLoggedIn>
-										<p>{JSON.stringify(LoggedInUser)}</p>
 										<ChessBoardWidget></ChessBoardWidget>
 									</RequireLoggedIn>
-								}
-							></Route>
-						</Routes>
-					</div>
-				</BrowserRouter>
-			</UserContext.Provider>
+								</UserContext.Provider>
+							}
+						></Route>
+					</Routes>
+				</div>
+			</BrowserRouter>
 		</LoggedInContext.Provider>
 	)
 }

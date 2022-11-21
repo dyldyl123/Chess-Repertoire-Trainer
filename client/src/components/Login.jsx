@@ -3,9 +3,10 @@ import fetchLogin from "../utils/Login"
 import { useNavigate } from "react-router-dom"
 import { UserContext } from "../App"
 import { LoggedInContext } from "../App"
-export default function Login({ setIsLoggedIn, setUser }) {
+export default function Login({ setIsLoggedIn }) {
 	const navigate = useNavigate()
 	const [formValue, setFormValue] = useState({})
+	const { user, setUser } = useContext(UserContext)
 	const [fields, setFields] = useState({
 		username: "",
 		password: "",
@@ -20,7 +21,6 @@ export default function Login({ setIsLoggedIn, setUser }) {
 		const loggedInReponse = await fetchLogin(fields)
 		if (loggedInReponse.user) {
 			setIsLoggedIn(true)
-			console.log(loggedInReponse.user)
 			setUser(loggedInReponse.user)
 			navigate("/")
 		}

@@ -1,5 +1,5 @@
 export default async function fetchLogin(formData) {
-	let data = await fetch("http://localhost:9001/api/login/", {
+	let data = await fetch("/api/login/", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
