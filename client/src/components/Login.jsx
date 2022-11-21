@@ -1,7 +1,9 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import fetchLogin from "../utils/Login"
 import { useNavigate } from "react-router-dom"
-export default function Login({ setIsLoggedIn }) {
+import { UserContext } from "../App"
+import { LoggedInContext } from "../App"
+export default function Login({ setIsLoggedIn, setUser }) {
 	const navigate = useNavigate()
 	const [formValue, setFormValue] = useState({})
 	const [fields, setFields] = useState({
@@ -18,9 +20,12 @@ export default function Login({ setIsLoggedIn }) {
 		const loggedInReponse = await fetchLogin(fields)
 		if (loggedInReponse.user) {
 			setIsLoggedIn(true)
+			console.log(loggedInReponse.user)
+			setUser(loggedInReponse.user)
 			navigate("/")
 		}
 	}
+
 	return (
 		<div className="login-form">
 			<form onSubmit={onSignIn}>

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Chess } from "chess.js"
 import { Chessboard } from "react-chessboard"
 import cloneDeep from "lodash/cloneDeep"
-
+import SaveEditMode from "./SaveEditMode"
 export default function ChessBoardWidget() {
 	const [game, setGame] = useState(new Chess())
 
@@ -41,5 +41,10 @@ export default function ChessBoardWidget() {
 		return true
 	}
 
-	return <Chessboard position={game.fen()} onPieceDrop={onDrop} />
+	return (
+		<div className="edit-mode">
+			<Chessboard position={game.fen()} onPieceDrop={onDrop} />
+			<SaveEditMode pgn={game.pgn()}></SaveEditMode>
+		</div>
+	)
 }
