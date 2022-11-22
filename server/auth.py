@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify , request, session,abort
-from models import User, Position, Outstanding, Card
+from models import User, Position, Outstanding, Card, ScoreHistory
 from app import db
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from merge import combinePGN
+from supermemo import supermemo_2
 import datetime
+from datetime import timedelta
 
 auth_router = Blueprint(__name__,'auth')
 
@@ -183,5 +185,31 @@ def merge_positions(user_id):
     output = combinePGN(pgns)
     output2 = str(output)
     return jsonify(output2)
+
+
+@auth_router.route('/api/setScore/<card_id>' , methods = ['POST'])
+@login_required
+def populate_latest_score(card_id):
+    score_data = request.get_json()
+    instance_of_score = ScoreHistory(**score_data)
+    db.session.add(instance_of_score)
+    db.session.flush()
+    
+    db.session.commit()
+
+    scores_for_card = ScoreHistory.query.filter(ScoreHistory.card_id == card_id).all()
+    score_history_for_card = [card.score for card in scores_for_card]
+  
+    delay = supermemo_2(x=score_history_for_card)
+    
+
+
+    outstanding_to_update = Outstanding.query.filter(Outstanding.card_id == instance_of_score.card_id).all()
+    outstanding_to_update[0].queue_time = datetime.datetime.now() + timedelta(days=delay)
+
+    db.session.add(outstanding_to_update[0])
+    db.session.commit()
+
+    return ''
 
 

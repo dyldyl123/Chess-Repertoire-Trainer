@@ -28,7 +28,9 @@ export default function PositionTree({ game, setGame, mode, setTest, treeData, s
 				setTest({
 					moveArray: history,
 					currentMove: 2,
+					id: treeData[0].id,
 				})
+
 				console.log(history)
 				console.log(mode)
 			}

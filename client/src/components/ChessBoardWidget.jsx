@@ -5,15 +5,11 @@ import cloneDeep from "lodash/cloneDeep"
 import SaveEditMode from "./SaveEditMode"
 import { useContext } from "react"
 import { UserContext } from "../App"
+import saveCardScore from "../utils/saveCardScore"
 export default function ChessBoardWidget({ game, setGame, test, setTest, mode }) {
 	const { user, setuser } = useContext(UserContext)
-
-	if (mode === "learn") {
-		let moveArray = test.moveArray
-		let currentMove = test.currentMove
-	} else {
-		let moveArray = []
-	}
+	const [errors, setErrors] = useState(5)
+	const [testScore, setTestScore] = useState(5)
 	// get the current move of the test and change the board state to that
 	// make sure it is the right colour of whose turn it is
 	// check if the move is correct
@@ -48,25 +44,42 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode })
 		})
 		let moveToCheck = testGame.undo()
 		let moveToCheckSan = moveToCheck.san
+		console.log(moveToCheckSan)
+		console.log(moveArray)
 		if (moveToCheckSan === moveArray[currentMove]) {
-			//check clock and assign grade
+			console.log("correct")
+
 			if (currentMove + 2 <= moveArray.length) {
 				setTest({ ...test, currentMove: currentMove + 2 })
 				// reset move time
 				setUpTestBoard(moveArray, currentMove + 2)
 			} else {
 				// test is finish
+				setTestScore(5 - errors)
+				saveCardScore(test.id, 5 - errors, user.id)
+				setErrors(0)
 			}
 		} else {
 			// call function to check if this move is in the positions (probably by checking history)
 			// setupTestBoard(moveArray,currentMOVE)
 			setTest({ ...test, currentMove: currentMove })
+			setErrors(errors - 1)
+			if (errors === 0) {
+				console.log(errors)
+				setTestScore(0)
+				saveCardScore(test.id, 0, user.id)
+				setErrors(0)
+				console.log("you dun goofed")
+				// run replay
+			}
 			// if its not then give give them a score based on time
 			// call setupTestBoard with MoveArray, maxmove+ 2
 		}
 	}
 
 	function onDropInTest(sourceSquare, targetSquare) {
+		let { moveArray, currentMove } = test
+		setUpTestBoard(moveArray, currentMove)
 		console.log(moveArray, currentMove)
 		const move = makeAMoveInTest(moveArray, currentMove, sourceSquare, targetSquare)
 	}
@@ -102,7 +115,7 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode })
 	return (
 		<div className="edit-mode">
 			<p>{JSON.stringify(user)}</p>
-			<Chessboard position={game.fen()} onPieceDrop={mode === "learn" ? onDropInTest : onDrop} />
+			<Chessboard position={game.fen()} onPieceDrop={onDropInTest} animationDuration={1300} />
 			<SaveEditMode pgn={game.pgn()} colour={game.turn()}></SaveEditMode>
 		</div>
 	)
