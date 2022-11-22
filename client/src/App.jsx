@@ -2,7 +2,7 @@ import { useState, useEffect, createContext, useContext } from "react"
 import ChessBoardWidget from "./components/ChessBoardWidget"
 import "./App.css"
 import verifyLogin from "./utils/verifyLogin"
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Navigate, Routes, Route, Link } from "react-router-dom"
 import Login from "./components/Login"
 import Register from "./components/Register"
 import PositionTree from "./components/PositionTree"
@@ -31,6 +31,7 @@ function App() {
 		<LoggedInContext.Provider value={isLoggedIn}>
 			<BrowserRouter>
 				<div className="App">
+					{isLoggedIn && <Link to="/learn">Learn</Link>}
 					<Routes>
 						<Route
 							path="/login"
@@ -45,7 +46,7 @@ function App() {
 							element={
 								<UserContext.Provider value={{ user, setUser }}>
 									<RequireLoggedIn>
-										<PositionBuilder></PositionBuilder>
+										<PositionBuilder mode="create"></PositionBuilder>
 									</RequireLoggedIn>
 								</UserContext.Provider>
 							}
@@ -55,6 +56,16 @@ function App() {
 							element={
 								<UserContext.Provider value={{ user, setUser }}>
 									<Register setIsLoggedIn={setIsLoggedIn} />
+								</UserContext.Provider>
+							}
+						></Route>
+						<Route
+							path="/learn"
+							element={
+								<UserContext.Provider value={{ user, setUser }}>
+									<RequireLoggedIn>
+										<PositionBuilder mode="learn"></PositionBuilder>
+									</RequireLoggedIn>
 								</UserContext.Provider>
 							}
 						></Route>

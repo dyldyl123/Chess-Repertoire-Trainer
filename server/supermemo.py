@@ -28,4 +28,4 @@ def supermemo_2(x: [int], a=6.0, b=-0.8, c=0.28, d=0.02, assumed_score=2.5, min_
     return a*(max(min_score, assumed_score + sum(b+c*x_i+d*x_i*x_i for x_i in x)))**(theta*r)
 
 
-print(supermemo_2(x=[1,2,1,2]))
+supermemo_2(x=[1,2,1,2])
