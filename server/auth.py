@@ -210,6 +210,10 @@ def populate_latest_score(card_id):
     db.session.add(outstanding_to_update[0])
     db.session.commit()
 
-    return ''
+    return jsonify({
+        'status': 'success',
+        'message': 'Score saved to Database',
+        'score_id': instance_of_score.id
+    })
 
 
