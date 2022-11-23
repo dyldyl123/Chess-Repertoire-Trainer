@@ -7,6 +7,9 @@ import Login from "./components/Login"
 import Register from "./components/Register"
 import PositionTree from "./components/PositionTree"
 import PositionBuilder from "./components/PositionBuilder"
+import TopNav from "./components/TopNav"
+import getOutstandingQueue from "./utils/getOutstandingQueue"
+
 export const LoggedInContext = createContext(false)
 export const UserContext = createContext({})
 function App() {
@@ -23,15 +26,19 @@ function App() {
 		}
 		return <Navigate to="/login" />
 	}
-	useEffect(() => {
-		verifyLogin()
-	}, [])
+	// useEffect(() => {
+	// 	getOutstandingQueue()
+	// }, [])
 
 	return (
 		<LoggedInContext.Provider value={isLoggedIn}>
 			<BrowserRouter>
 				<div className="App">
-					{isLoggedIn && <Link to="/learn">Learn</Link>}
+					{isLoggedIn && (
+						<UserContext.Provider value={{ user, setUser }}>
+							<TopNav />
+						</UserContext.Provider>
+					)}
 					<Routes>
 						<Route
 							path="/login"

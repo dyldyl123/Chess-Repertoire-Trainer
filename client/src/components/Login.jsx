@@ -3,7 +3,32 @@ import fetchLogin from "../utils/Login"
 import { useNavigate } from "react-router-dom"
 import { UserContext } from "../App"
 import { LoggedInContext } from "../App"
+import {
+	Flex,
+	Heading,
+	Input,
+	Button,
+	InputGroup,
+	Stack,
+	InputLeftElement,
+	chakra,
+	Box,
+	Link,
+	Avatar,
+	FormControl,
+	FormHelperText,
+	InputRightElement,
+	useToast,
+} from "@chakra-ui/react"
+
+import { FaUserAlt, FaLock } from "react-icons/fa"
+
+const CFaUserAlt = chakra(FaUserAlt)
+const CFaLock = chakra(FaLock)
+
 export default function Login({ setIsLoggedIn }) {
+	const toast = useToast()
+	const [showPassword, setShowPassword] = useState(false)
 	const navigate = useNavigate()
 	const [formValue, setFormValue] = useState({})
 	const { user, setUser } = useContext(UserContext)
@@ -11,6 +36,7 @@ export default function Login({ setIsLoggedIn }) {
 		username: "",
 		password: "",
 	})
+	const handleShowClick = () => setShowPassword(!showPassword)
 	const onType = (event) => {
 		const { name, value } = event.target
 		setFields({ ...fields, [name]: value })
@@ -24,24 +50,67 @@ export default function Login({ setIsLoggedIn }) {
 			setUser(loggedInReponse.user)
 			navigate("/")
 		}
+		toast({
+			title: "Logged In.",
+			description: "Welcome back to chess repertoire trainer",
+			status: "success",
+			duration: 9000,
+			isClosable: true,
+		})
 	}
 
 	const onNavigate = (event) => {
 		event.preventDefault()
 		navigate("/register")
 	}
-	return (
-		<div className="login-form">
-			<form onSubmit={onSignIn}>
-				<label htmlFor="username">Username</label>
-				<input type="text" name="username" onChange={onType} value={fields.username}></input>
-				<input type="password" name="password" onChange={onType} value={fields.password}></input>
-				<button type="submit">SUBMIT</button>
-			</form>
 
-			<div>
-				Don't have an account? Click <p onClick={onNavigate}>Here </p> to Signup
-			</div>
-		</div>
+	return (
+		<Flex flexDirection="column" width="100wh" height="100vh" backgroundColor="gray.200" justifyContent="center" alignItems="center">
+			<Stack flexDir="column" mb="2" justifyContent="center" alignItems="center">
+				<Avatar bg="teal.500" />
+				<Heading color="teal.400">Welcome</Heading>
+				<Box minW={{ base: "90%", md: "468px" }}>
+					<form onSubmit={onSignIn}>
+						<Stack spacing={4} p="1rem" backgroundColor="whiteAlpha.900" boxShadow="md">
+							<FormControl>
+								<InputGroup>
+									<InputLeftElement pointerEvents="none" children={<CFaUserAlt color="gray.300" />} />
+									<Input type="text" name="username" onChange={onType} value={fields.username} placeholder="username" />
+								</InputGroup>
+							</FormControl>
+							<FormControl>
+								<InputGroup>
+									<InputLeftElement pointerEvents="none" color="gray.300" children={<CFaLock color="gray.300" />} />
+									<Input
+										type={showPassword ? "text" : "password"}
+										name="password"
+										onChange={onType}
+										value={fields.password}
+										placeholder="Password"
+									/>
+									<InputRightElement width="4.5rem">
+										<Button h="1.75rem" size="sm" onClick={handleShowClick}>
+											{showPassword ? "Hide" : "Show"}
+										</Button>
+									</InputRightElement>
+								</InputGroup>
+								<FormHelperText textAlign="right">
+									<Link>forgot password?</Link>
+								</FormHelperText>
+							</FormControl>
+							<Button borderRadius={0} type="submit" variant="solid" colorScheme="teal" width="full">
+								Login
+							</Button>
+						</Stack>
+					</form>
+				</Box>
+			</Stack>
+			<Box>
+				New to us?{" "}
+				<Link onClick={onNavigate} color="teal.500">
+					Sign Up
+				</Link>
+			</Box>
+		</Flex>
 	)
 }

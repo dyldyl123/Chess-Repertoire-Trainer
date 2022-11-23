@@ -1,4 +1,5 @@
 export default async function saveCardScore(id, score, user_id) {
+	console.log(id, score, user_id)
 	const formattedData = {
 		user_id: user_id,
 		score: score,

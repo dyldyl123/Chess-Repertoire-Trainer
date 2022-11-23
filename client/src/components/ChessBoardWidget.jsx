@@ -1,42 +1,70 @@
-import { useState } from "react"
-import { Chess } from "chess.js"
+import { useState, useEffect } from "react"
+
 import { Chessboard } from "react-chessboard"
 import cloneDeep from "lodash/cloneDeep"
-import SaveEditMode from "./SaveEditMode"
+import SavePositionButton from "./SavePositionButton"
 import { useContext } from "react"
 import { UserContext } from "../App"
 import saveCardScore from "../utils/saveCardScore"
-export default function ChessBoardWidget({ game, setGame, test, setTest, mode }) {
+import { useToast, Button } from "@chakra-ui/react"
+export default function ChessBoardWidget({ game, setGame, test, setTest, mode, fetchRavPgn, fetchLearnQueue, queue }) {
+	const toast = useToast()
 	const { user, setuser } = useContext(UserContext)
 	const [errors, setErrors] = useState(5)
 	const [testScore, setTestScore] = useState(5)
-	// get the current move of the test and change the board state to that
-	// make sure it is the right colour of whose turn it is
-	// check if the move is correct
-	// if not check if the move is in the set of all positions, don't punish the user for picking the wrong line, let them try again
-	// if it failes both checks, record the time taken and take away one life
-	// if they run out of life or time is > some arbitrarly decided time
-	// they score a 0
-	// do a 'replay' of the correct move
+	const [orientation, setOrientation] = useState("white")
 
-	// record score somewhere and move onto next stage of test
+	useEffect(() => {
+		cloneAndReset()
+	}, [mode])
 
-	// if(mode === "learn" && test.length > 0)
+	useEffect(() => {
+		if (test.moveArray?.length === 0) {
+			cloneAndReset()
+		}
+		let gameCopy = cloneDeep(game)
+		gameCopy.reset()
+		setGame(gameCopy)
+		const wait = async () => {
+			await setTimeout(5000)
+		}
+		wait()
 
+		setUpTestBoard(test.moveArray, test.currentMove)
+		setPlaySide(test.colour)
+	}, [test])
+
+	function cloneAndReset() {
+		const gameCopy = cloneDeep(game)
+		gameCopy.reset()
+
+		setGame(gameCopy)
+	}
+	function setPlaySide(colour) {
+		colour === "b" ? setOrientation("black") : setOrientation("white")
+	}
 	function setUpTestBoard(moveArray, maxMove) {
 		const gameCopy = cloneDeep(game)
 
 		for (let i = 0; i < maxMove; i++) {
 			gameCopy.move(moveArray[i])
 		}
-
-		const result = gameCopy
-
-		console.log(gameCopy)
+		cloneAndReset()
 		setGame(gameCopy)
 	}
-	function makeAMoveInTest(moveArray, currentMove, sourceSquare, targetSquare) {
-		console.log("test move")
+	async function makeAMoveInTest(moveArray, currentMove, sourceSquare, targetSquare) {
+		if (errors === 0) {
+			toast({
+				title: "Failed variation test",
+				description: "Unable to make a move, no errors left",
+				status: "error",
+				duration: 9000,
+				isClosable: true,
+			})
+
+			return null
+		}
+
 		let testGame = cloneDeep(game)
 		testGame.move({
 			from: sourceSquare,
@@ -44,44 +72,64 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode })
 		})
 		let moveToCheck = testGame.undo()
 		let moveToCheckSan = moveToCheck.san
-		console.log(moveToCheckSan)
-		console.log(moveArray)
+		console.log("test check", moveToCheckSan, moveArray[currentMove], currentMove)
 		if (moveToCheckSan === moveArray[currentMove]) {
-			console.log("correct")
+			toast({
+				title: "Correct Move",
+				status: "success",
+				duration: 9000,
+				isClosable: true,
+			})
 
 			if (currentMove + 2 <= moveArray.length) {
 				setTest({ ...test, currentMove: currentMove + 2 })
-				// reset move time
 				setUpTestBoard(moveArray, currentMove + 2)
 			} else {
-				// test is finish
+				toast({
+					title: "Passed Varation Test",
+					description: ":)",
+					status: "success",
+					duration: 9000,
+					isClosable: true,
+				})
 				setTestScore(5 - errors)
-				saveCardScore(test.id, 5 - errors, user.id)
-				setErrors(0)
+				await saveCardScore(test.id, 5 - errors, user.id)
+				fetchLearnQueue(user.id)
+				setErrors(5)
+				cloneAndReset()
 			}
 		} else {
 			// call function to check if this move is in the positions (probably by checking history)
-			// setupTestBoard(moveArray,currentMOVE)
 			setTest({ ...test, currentMove: currentMove })
-			setErrors(errors - 1)
-			if (errors === 0) {
-				console.log(errors)
+			let newErrorCount = errors - 1
+			setErrors(newErrorCount)
+			toast({
+				title: "Incorrect Move",
+				duration: 9000,
+				isClosable: true,
+			})
+
+			if (newErrorCount === 0) {
+				toast({
+					title: "Failed variation Test",
+					description: `Calculating delay for next test attempt. The move list was as follows: ${test.moveArray}`,
+					status: "error",
+					duration: 9000,
+					isClosable: true,
+				})
 				setTestScore(0)
-				saveCardScore(test.id, 0, user.id)
-				setErrors(0)
-				console.log("you dun goofed")
-				// run replay
+				await saveCardScore(test.id, 0, user.id)
+				fetchLearnQueue(user.id)
+				setErrors(5)
+				setTest({ moveArray: [], colour: "w", currentMove: 0 })
 			}
-			// if its not then give give them a score based on time
-			// call setupTestBoard with MoveArray, maxmove+ 2
 		}
 	}
 
 	function onDropInTest(sourceSquare, targetSquare) {
-		let { moveArray, currentMove } = test
+		const { moveArray, currentMove } = test
 		setUpTestBoard(moveArray, currentMove)
-		console.log(moveArray, currentMove)
-		const move = makeAMoveInTest(moveArray, currentMove, sourceSquare, targetSquare)
+		makeAMoveInTest(moveArray, currentMove, sourceSquare, targetSquare)
 	}
 	function makeAMove(move) {
 		const gameCopy = cloneDeep(game)
@@ -99,24 +147,51 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode })
 	}
 
 	function onDrop(sourceSquare, targetSquare) {
-		console.log("onDrop")
 		const move = makeAMove({
 			from: sourceSquare,
 			to: targetSquare,
 		})
 
-		// illegal move
 		if (move === null) return false
-
-		setTimeout(makeRandomMove, 200)
 		return true
 	}
 
 	return (
 		<div className="edit-mode">
-			<p>{JSON.stringify(user)}</p>
-			<Chessboard position={game.fen()} onPieceDrop={onDropInTest} animationDuration={1300} />
-			<SaveEditMode pgn={game.pgn()} colour={game.turn()}></SaveEditMode>
+			<p>Welcome {user && user.username}</p>
+			<Chessboard position={game.fen()} onPieceDrop={mode === "learn" ? onDropInTest : onDrop} animationDuration={1300} boardOrientation={orientation} />
+			<SavePositionButton
+				pgn={game.pgn()}
+				colour={game.turn()}
+				history={game.history()}
+				fetchRavPgn={fetchRavPgn}
+				fetchLearnQueue={fetchLearnQueue}
+				orientation={orientation}
+			></SavePositionButton>
+			<Button
+				spacing="4"
+				onClick={() => {
+					setOrientation(orientation === "white" ? "black" : "white")
+				}}
+				colorScheme="yellow"
+				size="sm"
+			>
+				Switch Orientation
+			</Button>
+			{mode !== "learn" && (
+				<Button
+					spacing="4"
+					onClick={() => {
+						const gameCopy = cloneDeep(game)
+						gameCopy.undo()
+						setGame(gameCopy)
+					}}
+					colorScheme="blackAlpha"
+					size="sm"
+				>
+					Undo
+				</Button>
+			)}
 		</div>
 	)
 }

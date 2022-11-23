@@ -8,5 +8,4 @@ export default async function createPosition(positionData) {
 		body: JSON.stringify(positionData),
 	})
 	let response = await data.json()
-	console.log(response)
 }

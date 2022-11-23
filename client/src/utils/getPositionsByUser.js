@@ -4,6 +4,5 @@ export default async function getPositionsByUser(id) {
 		method: "GET",
 	})
 	let response = await data.json()
-	console.log(response)
 	return response
 }
