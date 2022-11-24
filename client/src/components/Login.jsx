@@ -65,22 +65,22 @@ export default function Login({ setIsLoggedIn }) {
 	}
 
 	return (
-		<Flex flexDirection="column" width="100wh" height="100vh" backgroundColor="gray.200" justifyContent="center" alignItems="center">
+		<Flex flexDirection="column" width="100wh" height="100vh" justifyContent="center" alignItems="center">
 			<Stack flexDir="column" mb="2" justifyContent="center" alignItems="center">
-				<Avatar bg="teal.500" />
-				<Heading color="teal.400">Welcome</Heading>
+				<Avatar />
+				<Heading>Welcome</Heading>
 				<Box minW={{ base: "90%", md: "468px" }}>
 					<form onSubmit={onSignIn}>
-						<Stack spacing={4} p="1rem" backgroundColor="whiteAlpha.900" boxShadow="md">
+						<Stack spacing={4} p="1rem" boxShadow="md">
 							<FormControl>
 								<InputGroup>
-									<InputLeftElement pointerEvents="none" children={<CFaUserAlt color="gray.300" />} />
+									<InputLeftElement pointerEvents="none" children={<CFaUserAlt />} />
 									<Input type="text" name="username" onChange={onType} value={fields.username} placeholder="username" />
 								</InputGroup>
 							</FormControl>
 							<FormControl>
 								<InputGroup>
-									<InputLeftElement pointerEvents="none" color="gray.300" children={<CFaLock color="gray.300" />} />
+									<InputLeftElement pointerEvents="none" children={<CFaLock />} />
 									<Input
 										type={showPassword ? "text" : "password"}
 										name="password"
@@ -98,7 +98,7 @@ export default function Login({ setIsLoggedIn }) {
 									<Link>forgot password?</Link>
 								</FormHelperText>
 							</FormControl>
-							<Button borderRadius={0} type="submit" variant="solid" colorScheme="teal" width="full">
+							<Button borderRadius={0} type="submit" variant="solid" width="full">
 								Login
 							</Button>
 						</Stack>
@@ -106,10 +106,7 @@ export default function Login({ setIsLoggedIn }) {
 				</Box>
 			</Stack>
 			<Box>
-				New to us?{" "}
-				<Link onClick={onNavigate} color="teal.500">
-					Sign Up
-				</Link>
+				New to us? <Link onClick={onNavigate}>Sign Up</Link>
 			</Box>
 		</Flex>
 	)

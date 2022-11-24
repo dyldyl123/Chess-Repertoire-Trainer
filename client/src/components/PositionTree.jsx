@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../App"
 import cloneDeep from "lodash/cloneDeep"
-
+import { Button } from "@chakra-ui/react"
 export default function PositionTree({ game, setGame, mode, setTest, queue, setQueue }) {
 	const { user, setUser } = useContext(UserContext)
 
@@ -14,8 +14,10 @@ export default function PositionTree({ game, setGame, mode, setTest, queue, setQ
 				let newGame = cloneDeep(game)
 				newGame.loadPgn(pgn, { sloppy: true })
 				let history = newGame.history()
-				console.log("i am setting the test to this movelist")
-				console.log(history)
+
+				newGame.reset()
+				setGame(newGame)
+
 				setTest({
 					moveArray: history,
 					currentMove: queue[0].colour === "w" ? 2 : 1,
@@ -27,7 +29,7 @@ export default function PositionTree({ game, setGame, mode, setTest, queue, setQ
 	}
 
 	if (queue.length > 0) {
-		return <div className="position-tree">{mode === "learn" && <button onClick={() => startTest()}> Start Test</button>}</div>
+		return <div className="position-tree">{mode === "learn" && <Button onClick={() => startTest()}> Start Test</Button>}</div>
 	} else {
 		if (mode === "learn") {
 			return <p>No Active Tests, Please come back later</p>

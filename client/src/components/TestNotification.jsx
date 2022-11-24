@@ -1,17 +1,17 @@
 import { useEffect, useState, useContext } from "react"
 import { UserContext } from "../App"
 import getOutstandingQueue from "../utils/getOutstandingQueue"
+import { queueAtom } from "./PositionBuilder"
+import { useAtom } from "jotai"
 export default function TestNotification() {
+	const [queue] = useAtom(queueAtom)
 	const [notifications, setNotifications] = useState(0)
 	const { user, setUser } = useContext(UserContext)
+	console.log(queue)
+
 	useEffect(() => {
-		const fetchOutstandingCards = async () => {
-			const queue = await getOutstandingQueue(user.id)
+		setNotifications(queue.length)
+	}, [queue])
 
-			setNotifications(queue.length)
-		}
-		fetchOutstandingCards()
-	})
-
-	return <h1 className="notification">{notifications}</h1>
+	return <h1 className="notification">Outstanding Tests {notifications}</h1>
 }

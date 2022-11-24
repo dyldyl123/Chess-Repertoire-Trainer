@@ -37,7 +37,6 @@ export default function SavePositionButton({ pgn, fetchLearnQueue, fetchRavPgn, 
 					})
 				}
 			}}
-			colorScheme="blue"
 			size="sm"
 		>
 			Save

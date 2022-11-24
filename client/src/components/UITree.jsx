@@ -1,8 +1,8 @@
 import TreeView, { flattenTree } from "react-accessible-treeview"
-
+import { Box } from "@chakra-ui/react"
 export default function UITree({ parsedRavPgn }) {
 	if (parsedRavPgn[0]?.moves?.length === 0) {
-		return <p>nothing</p>
+		return <p>No Positions Saved</p>
 	}
 	class Node {
 		constructor(move, parent = null) {
@@ -42,16 +42,18 @@ export default function UITree({ parsedRavPgn }) {
 		})
 
 		return (
-			<TreeView
-				data={treeData}
-				className="basic"
-				aria-label="basic example tree"
-				nodeRenderer={({ element, getNodeProps, level, handleSelect }) => (
-					<div {...getNodeProps()} style={{ paddingLeft: 20 * (level - 1) }}>
-						{element.name}
-					</div>
-				)}
-			/>
+			<Box border="8px" borderColor={"red.200"} p="10" ml="16" maxH="35em" overflowY="auto">
+				<TreeView
+					data={treeData}
+					className="basic"
+					aria-label="basic example tree"
+					nodeRenderer={({ element, getNodeProps, level, handleSelect }) => (
+						<div {...getNodeProps()} style={{ paddingLeft: 20 * (level - 1) }}>
+							{element.name}
+						</div>
+					)}
+				/>
+			</Box>
 		)
 	} else {
 		return <p>Loading...</p>

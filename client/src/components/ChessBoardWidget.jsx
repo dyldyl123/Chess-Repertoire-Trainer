@@ -81,7 +81,7 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode, f
 				isClosable: true,
 			})
 
-			if (currentMove + 2 <= moveArray.length) {
+			if (currentMove + 2 < moveArray.length) {
 				setTest({ ...test, currentMove: currentMove + 2 })
 				setUpTestBoard(moveArray, currentMove + 2)
 			} else {
@@ -122,6 +122,7 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode, f
 				fetchLearnQueue(user.id)
 				setErrors(5)
 				setTest({ moveArray: [], colour: "w", currentMove: 0 })
+				cloneAndReset()
 			}
 		}
 	}
@@ -173,7 +174,6 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode, f
 				onClick={() => {
 					setOrientation(orientation === "white" ? "black" : "white")
 				}}
-				colorScheme="yellow"
 				size="sm"
 			>
 				Switch Orientation
@@ -186,10 +186,23 @@ export default function ChessBoardWidget({ game, setGame, test, setTest, mode, f
 						gameCopy.undo()
 						setGame(gameCopy)
 					}}
-					colorScheme="blackAlpha"
 					size="sm"
 				>
 					Undo
+				</Button>
+			)}
+
+			{mode !== "learn" && (
+				<Button
+					spacing="4"
+					onClick={() => {
+						const gameCopy = cloneDeep(game)
+						gameCopy.reset()
+						setGame(gameCopy)
+					}}
+					size="sm"
+				>
+					Reset Board
 				</Button>
 			)}
 		</div>

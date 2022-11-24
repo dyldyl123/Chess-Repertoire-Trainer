@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, createContext } from "react"
 import { Chess } from "chess.js"
 import ChessBoardWidget from "./ChessBoardWidget"
 import PositionTree from "./PositionTree"
@@ -7,6 +7,9 @@ import getOutstandingQueue from "../utils/getOutstandingQueue"
 import { UserContext } from "../App"
 import UITree from "./uiTree"
 import { parse } from "@mliebelt/pgn-parser"
+import { atom, useAtom } from "jotai"
+
+export const queueAtom = atom([])
 export default function PositionBuilder({ mode }) {
 	const [game, setGame] = useState(new Chess())
 	const [test, setTest] = useState([
@@ -16,7 +19,7 @@ export default function PositionBuilder({ mode }) {
 			colour: "white",
 		},
 	])
-	const [queue, setQueue] = useState([])
+	const [queue, setQueue] = useAtom(queueAtom)
 	const [parsedRavPgn, setParsedRavPgn] = useState([])
 	const { user, setUser } = useContext(UserContext)
 
@@ -31,9 +34,7 @@ export default function PositionBuilder({ mode }) {
 		setQueue(cards)
 	}
 	useEffect(() => {
-		if (mode === "learn") {
-			fetchLearnQueue(user.id)
-		}
+		fetchLearnQueue(user.id)
 		fetchRavPgn(user.id)
 	}, [mode])
 
@@ -50,7 +51,7 @@ export default function PositionBuilder({ mode }) {
 				queue={queue}
 			></ChessBoardWidget>
 			<PositionTree game={game} setGame={setGame} mode={mode} test={test} setTest={setTest} queue={queue} setQueue={setQueue}></PositionTree>
-			<UITree parsedRavPgn={parsedRavPgn}></UITree>
+			{mode === "create" && <UITree parsedRavPgn={parsedRavPgn}></UITree>}
 		</div>
 	)
 }
